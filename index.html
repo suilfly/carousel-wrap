@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,user-scalable=no"
+    />
+    <title>无缝滑屏</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #wrap {
+        overflow: hidden;
+        height: 100%;
+      }
+      .carousel-wrap{ position: relative; }
+      .carousel-wrap>.my-list {
+        /* display: flex;也可以使用弹性盒+盒子宽度500% */
+       /*  width: 500%; */
+        /* ul里的li浮动后，ul高度塌陷，所以要清除浮动 */
+        overflow: hidden; /* 移动端清除浮动的方式 */
+        /* 脱离文档流，carousel-wrap高度塌陷 */
+        position: absolute;
+      }
+      .my-list > li {
+        /* width: 20%; */
+        list-style: none;
+        float: left; /* 父级元素ul的宽度不够如此设置依然不能成为一行 */
+      }
+      .my-list > li > a,
+      .my-list > li > a > img {
+        display: block; /* 不写这个有空隙 */
+      }
+      .my-list > li > a > img {
+        width: 100%; /* 一层层寻找设置宽度的父级元素，并以此为标准 */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div class="carousel-wrap">
+        
+      </div>
+    </div>
+  </body>
+  <script>
+    window.onload = function () {
+      document.addEventListener("touchstart", function (e) {
+        //滚动条会失效
+        let ev = e || event;/* IE低版本浏览器：将事件传入到window.event兼容 */
+        /* DOM事件流最独特的性质是，文本节点也触发事件（在IE中不会），当鼠标单击“单击此文本”文本时会触发click事件，该事件的捕获阶段最先开始，从Document节点开始逐渐向下传播，直到“单击此文本”文本节点，事件进入目标阶段，在目标阶段结束之后，事件由“单击此文本”文本节点开始事件的冒泡阶段，直到Document节点为止。 */
+        //为了提升移动端的滑动流畅性尽量减少：ev.preventDefault();/* 在滑动的时候会报错：Unable to preventDefault inside passive event listener due to target being treated as passive */
+        /* addEventListener方法是有第三个参数的，
+        叫useCapture：{
+        capture: Boolean, // 表示`listener`会在该类型的事件捕获阶段传播到该`EventTarget`时触发
+        once: Boolean, // 表示`listener`在添加之后最多只调用一次。如果是`true`，`listener`会在其被调用之后自动移除
+        passive: Boolean, // 表示`listener`永远不会调用`preventDefault()`。如果`listener`仍然调用了这个函数，客户端将会忽略它并抛出一个控制台警告
+        }
+
+        指在DOM树中，注册了该listener的元素，是否会先于它下方的任何事件目标，接收到该事件。
+        
+        */
+      },{ passive:true });
+    };
+    let carouselWrap = document.getElementsByClassName("carousel-wrap");
+    var src = [
+      "/img/1.jpg",
+      "/img/2.jpg",
+      "/img/3.jpg",
+      "/img/4.jpg",
+      "/img/5.jpg",
+    ];
+    carousel(src);
+    /* 使用插件的用户的存放图片path的数组不一定名：src，所以通过一个函数来规定 */
+    function carousel(src=["/img/1.jpg",
+      "/img/2.jpg",
+      "/img/3.jpg"]) {
+        let ul;
+      if (carouselWrap) {
+        ul = document.createElement("ul");
+        let ulWidth = src.length*100;
+        let liWidth = 100/src.length;
+        let liFromUl = ul.getElementsByTagName('li');
+        
+        ul.classList.add('my-list');
+        /* 动态创建DOM节点 */
+        src.forEach((i) => {
+          ul.innerHTML += `<li><a href="javascript:;"><img src="${i}" alt=""></a></li>`;
+        });
+        /* 动态计算滑动容器的宽度 */
+        ul.style.width = ulWidth+'%';
+        [...liFromUl].forEach((item)=>{
+            item.style.width = liWidth+'%';
+        });
+        /* 解决carouselWrap高度塌陷问题 */
+        [...carouselWrap].forEach(item=>{
+            item.appendChild(ul);
+            /* let img = document.querySelector('.my-list > li > a > img');console.dir(img.clientHeight);高度为0的原因：调试可知：在执行到这个语句时DOM节点还未渲染出来，所以没有高度。问题解决：异步编程 */
+            let imgTime = setTimeout(()=>{
+                let img = document.querySelector('.my-list > li > a > img');
+                item.style.height = img.clientHeight+'px';
+                clearInterval(imgTime);
+            },500)
+            /* 获取ul>li中的img的高度赋值给carouselWrap */
+        })    
+        /* 滑屏相关 */
+      let touchStartX = 0,touchdis = 0;
+      /* 滑动的元素的起始位置 */
+      let ulX = 0;
+      /* 图片的下标 */
+      /* let imgIndex = 0; */
+      /* 添加移动端事件 */
+      [...carouselWrap].forEach(item=>{
+        item.addEventListener('touchstart',function(e){ 
+          let touch = e.changedTouches[0];/* TouchList 接口代表一个触摸平面上所有触点的列表。例如，如果一个用户用三根手指接触屏幕（或者触控板），与之对应的 TouchList 会包含每根手指的 Touch 对象，总共三个 */
+          touchStartX = touch.clientX;
+          ulX = ul.offsetLeft;
+        });
+        item.addEventListener('touchmove',function(e){ 
+          let touch = e.changedTouches[0];
+          touchdis = touch.clientX - touchStartX;
+          ul.style.left =ulX+touchdis+'px';
+         });
+        item.addEventListener('touchend',function(e){
+          let index = ul.offsetLeft/document.documentElement.clientWidth;/* 用ul的实时位置抽象成下标，若index的下标为负：向左滑，为正：向右滑 */
+          index=Math.round(index)
+          if(index>0){
+            /* 往右划 */
+            ul.style.left = index*(document.documentElement.clientWidth)+'px';console.log(index);
+
+          }
+          else{
+            /* 向左划 */
+            if(Math.abs(touchdis)>=document.documentElement.clientWidth/2){ /* 移动距离大于视口的一半 */
+               ul.style.left = index*(document.documentElement.clientWidth)+'px';console.log(index);/* 每次移动一个视口的宽度  Math.round(index):四舍五入返回整数*/
+            }
+            else{
+              ul.style.left =ulX+'px';
+            }
+               
+          }
+        });
+      })   
+      }
+
+    
+    
+     
+    }
+  </script>
+</html>
