@@ -8,39 +8,7 @@
       content="width=device-width, initial-scale=1.0,user-scalable=no"
     />
     <title>无缝滑屏</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-      }
-      html,
-      body,
-      #wrap {
-        overflow: hidden;
-        height: 100%;
-      }
-      .carousel-wrap{ position: relative; }
-      .carousel-wrap>.my-list {
-        /* display: flex;也可以使用弹性盒+盒子宽度500% */
-       /*  width: 500%; */
-        /* ul里的li浮动后，ul高度塌陷，所以要清除浮动 */
-        overflow: hidden; /* 移动端清除浮动的方式 */
-        /* 脱离文档流，carousel-wrap高度塌陷 */
-        position: absolute;
-      }
-      .my-list > li {
-        /* width: 20%; */
-        list-style: none;
-        float: left; /* 父级元素ul的宽度不够如此设置依然不能成为一行 */
-      }
-      .my-list > li > a,
-      .my-list > li > a > img {
-        display: block; /* 不写这个有空隙 */
-      }
-      .my-list > li > a > img {
-        width: 100%; /* 一层层寻找设置宽度的父级元素，并以此为标准 */
-      }
-    </style>
+    <link rel="stylesheet" href="/css/carousel.css">
   </head>
   <body>
     <div id="wrap">
