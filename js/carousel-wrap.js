@@ -5,6 +5,7 @@ class Carousel {
             "/img/2.jpg",
             "/img/3.jpg"];
         this.carouselWrap = carouselWrap;
+        this.time;/* 在每一个对象中保存自动播放的定时器序号，用于以后清除定时器 */
         this.init(imgSrc, carouselWrap);
     }
 }
@@ -20,7 +21,7 @@ function createLiDom(src,carouselWrap) {
     let ulWidth = src.length * 100;/* 动态计算ul的宽度 */
     let liWidth = 100 / src.length;/* 动态计算ul>li的宽度 */
     let liFromUl = ul.getElementsByTagName('li');
- 
+    let time;/* 用于接收autoplay的定时器序号 */
 
     ul.classList.add('my-list');
     /* 动态创建DOM节点 */
@@ -40,11 +41,15 @@ function createLiDom(src,carouselWrap) {
     let imgTime = setTimeout(() => {
         let img = document.querySelector('.my-list > li > a > img');
         carouselWrap.style.height = img.clientHeight + 'px';
+        
         clearInterval(imgTime);
-    }, 500);
+       
+    }, 500); 
+  /*   time=autoPlay({ul,src});console.log('ct '+time); */
     return {ul,liFromUl,src};
 }
 function touchMove(_this,{ul,liFromUl,src}){
+        
         let viewWidth = document.documentElement.clientWidth;
         /* 滑屏相关 */
         let touchStartX = 0, touchdis = 0;
@@ -59,22 +64,19 @@ function touchMove(_this,{ul,liFromUl,src}){
             touchStartX = touch.clientX;
             ulX = ul.offsetLeft;
             ul.style.transition = "";
-     
+            
            
             
         });
         _this.carouselWrap.addEventListener('touchmove', function (e) {
             let touch = e.changedTouches[0];
-            /* let absOffLeft = Math.abs(ul.offsetLeft);
-            let viewWidth = document.documentElement.clientWidth; */
             touchdis = touch.clientX - touchStartX;
             ul.style.left = ulX + touchdis + 'px';
-           /*  if(absOffLeft/viewWidth == liFromUl.length-1){ console.log(111); } */
         });
         _this.carouselWrap.addEventListener('touchend', function (e) {
             let index = ul.offsetLeft / document.documentElement.clientWidth;/* 用ul的实时位置抽象成下标，若index的下标为负：向左滑，为正：向右滑 */
             index = Math.round(index)
-
+            
             /* 设置超出部分 */
 
             if (Math.abs(touchdis) >= document.documentElement.clientWidth / 2) { /* 移动距离大于视口的一半 */
@@ -86,35 +88,58 @@ function touchMove(_this,{ul,liFromUl,src}){
                 else{
                     ul.style.transition = " left .5s";
                 }
-                
                 ul.style.left = index * (document.documentElement.clientWidth) + 'px'; console.log(index);/* 每次移动一个视口的宽度  Math.round(index):四舍五入返回整数*/
+                
             }
             else {
                 ul.style.left = ulX + 'px';
             }
-
-
+            clearInterval(_this.time);/* _this指向对象，清除每一个对象中的定时器 */
+            autoPlay(_this,{ul,src});/* 滑屏结束后再次开启定时器 */
+           
         });
+
+}
+/* 用Promise封装定时器 */
+function interval(deplay=1000,callback){
+    return new Promise((resolve)=>{
+        let id = setInterval(()=>{
+            callback(id,resolve);
+        },deplay);
+        
+    })
 }
 /* 自动轮播 */
-function autoPlay({ul,liFromUl}){
-let stepLengh = ul.querySelector("li img").clientWidth;
-ul.style.transition = "left 1.5s";
-ul.style.left = ul.offsetLeft+'px';
-setInterval(()=>{
-    let index = Math.round(ul.offsetLeft/document.documentElement.clientWidth);
-    ul.style.left =(--index) * (document.documentElement.clientWidth) + 'px';
-},5000)
+function autoPlay(_this,{ul,src}){
+let stepLengh = document.documentElement.clientWidth;
+/* let timeId = time || 0; *//* 将定时器序号放入数组中，用于以后清空定时器使用 */
+interval(4000,(id,resolve)=>{
+    _this.time=id;console.log(id);
+    ul.style.transition = "left 2s";
+    let index = ul.offsetLeft/stepLengh;
+    let i = Math.round(index);
+    ul.style.left = (--i)*stepLengh+'px';
+    if(-index >= (src.length-2)){/* -index >= (src.length-2)为了解决在自动播放的时候滑屏导致index不进入此if判断 */
+      
+       resolve();
+       ul.style.transition = "";
+       ul.style.left = -stepLengh+'px';
+    } 
+}).then(()=>{
+    
+});
+    
 }
 
 function carousel(src = ["/img/1.jpg",
     "/img/2.jpg",
     "/img/3.jpg"], carouselWrap) {
-    let ul;
+    let list,timeId;/* list:createLiDom返回的参数*/
     if (carouselWrap) {
-        ul=createLiDom(src,carouselWrap);
-        /* autoPlay(ul); */
-        touchMove(this,ul);
+        list=createLiDom(src,carouselWrap);
+        autoPlay(this,list);
+        touchMove(this,list);
+       
     }
 
 }
