@@ -8,27 +8,29 @@
       content="width=device-width, initial-scale=1.0,user-scalable=no"
     />
     <title>无缝滑屏</title>
-    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/carousel.css" />
   </head>
   <body>
     <div id="wrap">
-      <div id="c1" class="carousel-wrap" i-src=mysrc>
-       
-      </div>
-   <!--    <div id="c2" class="carousel-wrap">
+      <div id="c1" class="carousel-wrap" i-src="mysrc"></div>
+      <!--    <div id="c2" class="carousel-wrap">
         
       </div> -->
     </div>
+    
   </body>
   <script src="/js/carousel-wrap.js"></script>
   <script>
     window.onload = function () {
-      document.addEventListener("touchstart", function (e) {
-        //滚动条会失效
-        let ev = e || event;/* IE低版本浏览器：将事件传入到window.event兼容 */
-        /* DOM事件流最独特的性质是，文本节点也触发事件（在IE中不会），当鼠标单击“单击此文本”文本时会触发click事件，该事件的捕获阶段最先开始，从Document节点开始逐渐向下传播，直到“单击此文本”文本节点，事件进入目标阶段，在目标阶段结束之后，事件由“单击此文本”文本节点开始事件的冒泡阶段，直到Document节点为止。 */
-        //为了提升移动端的滑动流畅性尽量减少：ev.preventDefault();/* 在滑动的时候会报错：Unable to preventDefault inside passive event listener due to target being treated as passive */
-        /* addEventListener方法是有第三个参数的，
+      document.addEventListener(
+        "touchstart",
+        function (e) {
+          //滚动条会失效
+          let ev =
+            e || event; /* IE低版本浏览器：将事件传入到window.event兼容 */
+          /* DOM事件流最独特的性质是，文本节点也触发事件（在IE中不会），当鼠标单击“单击此文本”文本时会触发click事件，该事件的捕获阶段最先开始，从Document节点开始逐渐向下传播，直到“单击此文本”文本节点，事件进入目标阶段，在目标阶段结束之后，事件由“单击此文本”文本节点开始事件的冒泡阶段，直到Document节点为止。 */
+          //为了提升移动端的滑动流畅性尽量减少：ev.preventDefault();/* 在滑动的时候会报错：Unable to preventDefault inside passive event listener due to target being treated as passive */
+          /* addEventListener方法是有第三个参数的，
         叫useCapture：{
         capture: Boolean, // 表示`listener`会在该类型的事件捕获阶段传播到该`EventTarget`时触发
         once: Boolean, // 表示`listener`在添加之后最多只调用一次。如果是`true`，`listener`会在其被调用之后自动移除
@@ -38,7 +40,9 @@
         指在DOM树中，注册了该listener的元素，是否会先于它下方的任何事件目标，接收到该事件。
         
         */
-      },{ passive:true });
+        },
+        { passive: true }
+      );
     };
     /* let carouselWrap = document.getElementsByClassName("carousel-wrap")[0]; */
     var mysrc = [
@@ -48,12 +52,8 @@
       "/img/4.jpg",
       "/img/5.jpg",
     ];
-    var src2 = [
-      "/img/1.jpg",
-      "/img/2.jpg",
-      "/img/3.jpg"
-    ];
-    let c1 = new Carousel(mysrc,document.getElementById("c1"));
-    let c2 = new Carousel(src2,document.getElementById("c2"));
+    var src2 = ["/img/1.jpg", "/img/2.jpg", "/img/3.jpg"];
+    let c1 = new Carousel(mysrc, document.getElementById("c1"));
+    let c2 = new Carousel(src2, document.getElementById("c2"));
   </script>
 </html>
