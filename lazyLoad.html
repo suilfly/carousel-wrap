@@ -52,7 +52,7 @@
       <img class="imgd" data-src="/img/3.jpg" alt="" />
       <img class="imgd" data-src="/img/4.jpg" alt="" />
     </div>
-    <script>
+  <!--   <script>
         const con = document.querySelector('.img-div');
         const imgList = document.querySelectorAll('.img-div>img');console.log(imgList)
         let options = {
@@ -78,6 +78,33 @@
         imgList.forEach(img=>{
             lazyLoad(img);
         })
-    </script>
+    </script> -->
+  <script>
+    let options = {
+      rootMargin:'100px 0px',/* 上面代码中，除了root属性，还有rootMargin属性。后者定义根元素的margin，用来扩展或缩小rootBounds这个矩形的大小，从而影响intersectionRect交叉区域的大小。它使用CSS的定义方法，比如10px 20px 30px 40px，表示 top、right、bottom 和 left 四个方向的值。 */
+      thresholds:[0]/* threshold属性决定了什么时候触发回调函数。它是一个数组，每个成员都是一个门槛值，默认为[0]，即交叉比例（intersectionRatio）达到0时触发回调函数。 */
+    };
+    function callback(entries,observer){
+      entries.forEach(entry=>{//entries:entries）是一个数组，每个成员都是一个IntersectionObserverEntry对象。举例来说，如果同时有两个被观察的对象的可见性发生变化，entries数组就会有两个成员。
+        if(entry.isIntersecting){
+          let img = entry.target;
+          img.src = img.getAttribute('data-src');
+          img.classList.add('imgl');
+          observer.disconnect();//断开连接,不observe 这个img
+        }
+      })
+    }
+  /*   let imgList = document.querySelectorAll('.img-div>img');
+    imgList.forEach(img=>{
+      let observer = new IntersectionObserver(callback,options);//为每一个img创建
+      observer.observe(img);
+    }) */
+    
+   
+  </script>
+  <script>
+    let imgList = document.querySelectorAll('.img-div>img');
+    
+  </script>
   </body>
 </html>
