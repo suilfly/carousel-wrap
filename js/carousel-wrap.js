@@ -57,9 +57,10 @@ function touchMove(_this,{ul,liFromUl,src}){
         let ulX = -viewWidth;
         /* 添加移动端事件 */
         ul.style.left = ulX+'px';
-        _this.carouselWrap.addEventListener('touchstart', function (e) {
-            let touch = e.changedTouches[0];/* TouchList 接口代表一个触摸平面上所有触点的列表。例如，如果一个用户用三根手指接触屏幕（或者触控板），与之对应的 TouchList 会包含每根手指的 Touch 对象，总共三个 */
-            let absOffLeft = Math.abs(ul.offsetLeft);
+        _this.carouselWrap.addEventListener('touchstart', /* function (e) {
+            let touch = e.changedTouches[0]; */
+            /* TouchList 接口代表一个触摸平面上所有触点的列表。例如，如果一个用户用三根手指接触屏幕（或者触控板），与之对应的 TouchList 会包含每根手指的 Touch 对象，总共三个 */
+           /*  let absOffLeft = Math.abs(ul.offsetLeft);
             
             touchStartX = touch.clientX;
             ulX = ul.offsetLeft;
@@ -67,7 +68,7 @@ function touchMove(_this,{ul,liFromUl,src}){
             
            
             
-        });
+        } */);
         _this.carouselWrap.addEventListener('touchmove', function (e) {
             let touch = e.changedTouches[0];
             touchdis = touch.clientX - touchStartX;
